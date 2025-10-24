@@ -39,7 +39,8 @@
             "appKey": "123456784",
             "appSecret": "abcdefghigjk"
           },
-          "environment": "TEST"
+          "_comment_environment": "Available: PRODUCTION (운영 환경, 기본값) | STAGING (검증 환경) | DEVELOPMENT (개발/테스트 환경)",
+          "environment": "PRODUCTION"
         }
       ]
     ]
