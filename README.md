@@ -22,8 +22,8 @@ AdChain SDK의 React Native 통합 예제 앱입니다. Expo 환경에서 광고
 ### 1. 설치
 
 ```bash
-# 의존성 설치
-npm ci
+# 의존성 설치 (둘 다 가능)
+npm ci        # 또는 npm install
 
 # iOS Pod 설치 (macOS만)
 cd ios
