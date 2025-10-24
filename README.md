@@ -5,8 +5,9 @@ AdChain SDK의 React Native 통합 예제 앱입니다. Expo 환경에서 광고
 ## 📱 주요 기능
 
 ### 홈 탭
-- **SDK 초기화**: 앱 시작 시 자동으로 AdChain SDK 초기화
-- **사용자 로그인/로그아웃**: `AdchainSDK.login()` / `logout()` 호출
+- **SDK 초기화**: "SDK 초기화" 버튼 클릭으로 명시적 초기화
+- **사용자 로그인/로그아웃**: User ID, Gender, Birth Year 입력 폼 제공
+- **로그인 데이터 저장**: AsyncStorage로 로그인 정보 자동 복원
 - **모달 오퍼월**: `AdchainSDK.openOfferwall()` - 전체 화면 오퍼월 팝업
 
 ### 혜택 탭
@@ -126,7 +127,7 @@ const handleInitialize = async () => {
 };
 ```
 
-**참고**: 이 샘플 앱은 **방법 1 (자동 초기화)** 을 사용합니다. `src/App.tsx`를 참고하세요.
+**참고**: 이 샘플 앱은 HomeScreen에서 **명시적 초기화** 방식을 사용합니다. `src/screens/HomeScreen.tsx`를 참고하세요.
 
 ### Step 2: 사용자 로그인
 
@@ -135,7 +136,11 @@ const handleInitialize = async () => {
 ```tsx
 const handleLogin = async () => {
   try {
-    await AdchainSDK.login({ userId: 'user-12345' });
+    await AdchainSDK.login({
+      userId: 'user-12345',
+      gender: 'MALE',       // 선택: 'MALE' | 'FEMALE'
+      birthYear: 1990       // 선택: 출생년도
+    });
     console.log('✅ Logged in');
   } catch (error) {
     console.error('❌ Login failed:', error);
@@ -312,12 +317,12 @@ useEffect(() => {
 ```
 adchain-sdk-react-native-example/
 ├── src/
-│   ├── App.tsx                      # 앱 엔트리, SDK 자동 초기화
+│   ├── App.tsx                      # 앱 엔트리 (SDK 초기화 없음)
 │   ├── components/
 │   │   ├── TabNavigation.tsx        # 홈/혜택 탭 네비게이션, 임베디드 오퍼월
 │   │   └── Toast.tsx                # 토스트 알림 컴포넌트
 │   └── screens/
-│       └── HomeScreen.tsx           # 로그인/로그아웃, 모달 오퍼월
+│       └── HomeScreen.tsx           # SDK 초기화, 로그인/로그아웃, 모달 오퍼월
 ├── android/                         # Android 네이티브 코드
 ├── ios/                             # iOS 네이티브 코드
 ├── app.json                         # Expo 설정 (SDK 플러그인 포함)
@@ -454,7 +459,7 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 |--------|-----------|--------|------|
 | `autoInitialize()` | - | `Promise<void>` | SDK 자동 초기화 (app.json 읽음) |
 | `initialize(config)` | `{ appKey, appSecret, environment }` | `Promise<void>` | SDK 수동 초기화 |
-| `login(params)` | `{ userId: string }` | `Promise<void>` | 사용자 로그인 |
+| `login(params)` | `{ userId: string, gender?: "MALE" \| "FEMALE", birthYear?: number }` | `Promise<void>` | 사용자 로그인 |
 | `logout()` | - | `Promise<void>` | 사용자 로그아웃 |
 | `openOfferwall(placementId)` | `placementId: string` | `Promise<void>` | 모달 오퍼월 열기 |
 | `isInitialized()` | - | `Promise<boolean>` | SDK 초기화 상태 확인 |
@@ -491,6 +496,7 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 ## 📦 Dependencies
 
 - **AdChain SDK**: `@1selfworld/adchain-sdk-react-native` ^1.0.11
+- **AsyncStorage**: `@react-native-async-storage/async-storage` ^2.2.0
 - **Expo**: ~53.0.0
 - **React Native**: 0.79.6
 - **React**: 19.0.0
