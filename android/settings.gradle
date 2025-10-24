@@ -38,10 +38,9 @@ expoAutolinking.useExpoVersionCatalog()
 include ':app'
 includeBuild(expoAutolinking.reactNativeGradlePlugin)
 
-// AdChain SDK - Required repositories
+// AdChain SDK - JitPack repository
 dependencyResolutionManagement {
     repositories {
         maven { url "https://jitpack.io" }
-        maven { url "https://releases.adjoe.io/maven" }
     }
 }
