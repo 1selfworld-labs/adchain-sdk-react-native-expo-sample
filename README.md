@@ -1,4 +1,4 @@
-# AdChain SDK React Native Example
+# AdChain SDK React Native Expo Example
 
 AdChain SDK의 React Native 통합 예제 앱입니다. Expo 환경에서 광고 오퍼월 기능을 구현하는 방법을 데모합니다.
 
