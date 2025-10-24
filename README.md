@@ -90,13 +90,36 @@ npm run android
 
 SDK를 초기화하는 두 가지 방법이 있습니다:
 
-#### 방법 1: 자동 초기화 (권장)
+#### 방법 1: 수동 초기화 (샘플 앱 방식)
+
+특정 시점에 수동으로 초기화하는 방식입니다. 이 샘플 앱은 HomeScreen의 "SDK 초기화" 버튼 클릭 시 초기화합니다:
+
+```tsx
+import AdchainSDK from '@1selfworld/adchain-sdk-react-native';
+import { Platform } from 'react-native';
+
+const handleInitialize = async () => {
+  await AdchainSDK.initialize({
+    appKey: Platform.OS === 'ios' ? '123456784' : '123456783',
+    appSecret: 'abcdefghigjk',
+    environment: 'TEST'
+  });
+  console.log('✅ SDK initialized');
+};
+```
+
+**장점**:
+- 초기화 시점을 정확히 제어 가능
+- 사용자 동의 후 초기화 등 유연한 시나리오 지원
+- 디버깅이 용이함
+
+**샘플 앱 구현**: `src/screens/HomeScreen.tsx:95-126`
+
+#### 방법 2: 자동 초기화 (선택사항)
 
 앱 시작 시 `app.json` 설정을 자동으로 읽어 초기화:
 
 ```tsx
-import AdchainSDK from '@1selfworld/adchain-sdk-react-native';
-
 useEffect(() => {
   AdchainSDK.autoInitialize()
     .then(() => {
@@ -108,26 +131,7 @@ useEffect(() => {
 }, []);
 ```
 
-> **참고**: `autoInitialize()`는 `app.json`의 플러그인 설정을 자동으로 읽어 SDK를 초기화합니다.
-
-#### 방법 2: 수동 초기화
-
-특정 시점에 수동으로 초기화하거나 테스트 목적으로 사용:
-
-```tsx
-import { Platform } from 'react-native';
-
-const handleInitialize = async () => {
-  await AdchainSDK.initialize({
-    appKey: Platform.OS === 'ios' ? 'YOUR_IOS_KEY' : 'YOUR_ANDROID_KEY',
-    appSecret: 'YOUR_SECRET',
-    environment: 'TEST'
-  });
-  console.log('✅ SDK initialized');
-};
-```
-
-**참고**: 이 샘플 앱은 HomeScreen에서 **명시적 초기화** 방식을 사용합니다. `src/screens/HomeScreen.tsx`를 참고하세요.
+> **참고**: `autoInitialize()`는 `app.json`의 플러그인 설정을 자동으로 읽어 SDK를 초기화합니다. 이 샘플 앱에서는 사용하지 않습니다.
 
 ### Step 2: 사용자 로그인
 

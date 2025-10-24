@@ -112,15 +112,18 @@ src/
 ```tsx
 // HomeScreen.tsx
 const handleInitialize = async () => {
-  await AdchainSDK.autoInitialize();
-  // app.json의 플랫폼별 credentials 자동 읽음
-  // → iOS: Info.plist의 AdChainAppKey/AdChainAppSecret
-  // → Android: build.gradle의 ADCHAIN_APP_KEY/ADCHAIN_APP_SECRET
+  await AdchainSDK.initialize({
+    appKey: Platform.OS === 'ios' ? '123456784' : '123456783',
+    appSecret: 'abcdefghigjk',
+    environment: 'TEST'
+  });
+  // 수동 초기화 방식 사용 (app.json 값과 동일)
+  // 네이티브 SDK 상태 확인 후 UI 업데이트
 };
 ```
 
 사용자가 "SDK 초기화" 버튼을 눌러 명시적으로 SDK를 활성화합니다.
-App.tsx에서는 자동 초기화를 수행하지 않습니다.
+App.tsx에서는 어떠한 초기화도 수행하지 않습니다.
 
 **2. 네이티브 뷰 통합 (npm 패키지의 AdchainOfferwallView)**
 ```tsx
