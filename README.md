@@ -50,7 +50,7 @@ cd ..
             "appKey": "YOUR_IOS_APP_KEY",
             "appSecret": "YOUR_IOS_APP_SECRET"
           },
-          "environment": "TEST"  // "PROD" 또는 "TEST"
+          "environment": "PRODUCTION"
         }
       ]
     ]
@@ -102,7 +102,7 @@ const handleInitialize = async () => {
   await AdchainSDK.initialize({
     appKey: Platform.OS === 'ios' ? '123456784' : '123456783',
     appSecret: 'abcdefghigjk',
-    environment: 'TEST'
+    environment: 'PRODUCTION'
   });
   console.log('✅ SDK initialized');
 };
