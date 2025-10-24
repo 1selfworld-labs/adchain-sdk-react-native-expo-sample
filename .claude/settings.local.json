@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/donghoon/Desktop/GIT/fly33499/ad-chain-sdk/**)",
+      "Bash(ls:*)",
+      "Bash(npm whoami:*)",
+      "Bash(npm run ios:*)",
+      "Bash(tee:*)",
+      "Read(//private/tmp/**)",
+      "Bash(cat:*)",
+      "Bash(npm ls:*)",
+      "Bash(readlink:*)",
+      "Read(//tmp/**)",
+      "Bash(adb logcat:*)",
+      "Bash(adb devices:*)",
+      "Bash(adb shell:*)",
+      "Bash(npx react-native config)",
+      "Bash(npm view:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
