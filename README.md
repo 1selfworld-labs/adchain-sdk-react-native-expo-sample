@@ -31,6 +31,26 @@ pod install
 cd ..
 ```
 
+**Android 필수 설정**
+
+`android/build.gradle` 파일에 adjoe Maven 저장소를 추가해야 합니다:
+
+```gradle
+allprojects {
+  repositories {
+    maven {
+      url(reactNativeAndroidDir)
+    }
+    google()
+    mavenCentral()
+    maven { url 'https://www.jitpack.io' }
+    maven { url 'https://releases.adjoe.io/maven' }  // ← 필수: AdChain SDK 의존성
+  }
+}
+```
+
+> ⚠️ **중요**: 이 설정이 없으면 Android 빌드 시 `adjoe-sdk-android` 의존성을 찾지 못해 빌드가 실패합니다.
+
 ### 2. SDK 설정
 
 `app.json` 파일에서 AdChain SDK 설정:
