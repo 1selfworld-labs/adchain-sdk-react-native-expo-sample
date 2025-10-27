@@ -195,6 +195,115 @@ import { AdchainOfferwallView } from '@1selfworld/adchain-sdk-react-native';
 
 > **중요**: `AdchainOfferwallView`는 SDK 패키지(`@1selfworld/adchain-sdk-react-native`)에서 직접 제공됩니다. 별도로 래퍼 컴포넌트를 만들 필요가 없습니다.
 
+#### ⚠️ 중요: 올바른 배치 구조
+
+`AdchainOfferwallView`는 **내부적으로 WebView 스택을 관리**하기 때문에 특정 구조 제약이 있습니다. 잘못된 구조로 사용하면 스크롤 충돌, 터치 이벤트 소실, 백버튼 오작동 등의 문제가 발생합니다.
+
+##### ✅ 올바른 구조 (권장)
+
+```tsx
+// 현재 샘플 앱 구조 (src/components/TabNavigation.tsx:44-100)
+<View style={{ flex: 1 }}>
+  {activeTab === 'benefits' ? (
+    // 단순 레이아웃 컨테이너는 허용 (pointerEvents="box-none" 권장)
+    <View style={{ flex: 1 }} pointerEvents="box-none">
+      <AdchainOfferwallView
+        ref={offerwallViewRef}
+        placementId="tab_embedded_offerwall"
+        style={{ flex: 1, width: '100%' }}
+      />
+    </View>
+  ) : (
+    <ScrollView><HomeScreen /></ScrollView>
+  )}
+
+  {/* 하단 탭 바 */}
+  <View style={styles.tabContainer}>
+    {/* Tab Buttons */}
+  </View>
+</View>
+```
+
+**핵심 포인트**:
+- ✅ 탭 네비게이션의 **직접 자식**으로 배치
+- ✅ `flex: 1`로 전체 공간 차지
+- ✅ 단순 레이아웃 컨테이너 View는 허용 (단, `pointerEvents="box-none"` 권장)
+
+##### ❌ 피해야 할 구조 (오류 발생)
+
+```tsx
+// ❌ 잘못된 예시 1: ScrollView로 래핑
+<ScrollView>
+  {/* 스크롤 충돌 발생 - WebView 내부 스크롤과 외부 ScrollView 충돌 */}
+  <AdchainOfferwallView style={{ height: 500 }} />
+</ScrollView>
+
+// ❌ 잘못된 예시 2: FlatList로 래핑
+<FlatList
+  data={[{ key: 'offerwall' }]}
+  renderItem={() => (
+    {/* 가상화 충돌 - WebView가 예측 불가능하게 재렌더링됨 */}
+    <AdchainOfferwallView style={{ height: 500 }} />
+  )}
+/>
+
+// ❌ 잘못된 예시 3: React Navigation Stack
+<NavigationContainer>
+  <Stack.Navigator>
+    <Stack.Screen name="Offerwall">
+      {() => (
+        {/* 백버튼 충돌 - Stack Navigator가 백버튼 이벤트를 먼저 가로챔 */}
+        <AdchainOfferwallView />
+      )}
+    </Stack.Screen>
+  </Stack.Navigator>
+</NavigationContainer>
+
+// ❌ 잘못된 예시 4: 중첩된 제스처 핸들러
+<PanGestureHandler>
+  {/* 터치 이벤트 소실 - 제스처 핸들러가 터치를 인터셉트 */}
+  <AdchainOfferwallView />
+</PanGestureHandler>
+```
+
+##### 왜 이런 제약이 있나요?
+
+Android/iOS 네이티브 SDK는 다음과 같은 특수 기능을 구현합니다:
+
+1. **WebView Stack 관리** (Android: `AdchainOfferwallView.kt:44-46`, iOS: `AdchainOfferwallView.swift:11-13`)
+   - 여러 WebView를 Z-Order로 쌓아 페이지 간 네비게이션 구현
+   - 각 WebView를 Cross Fade 애니메이션으로 전환
+   - 외부 래핑 뷰가 있으면 Z-Order 제어가 깨짐
+
+2. **Touch Event 직접 처리**
+   - WebView가 터치 이벤트를 직접 받아야 함
+   - ScrollView, FlatList 등 중간 래핑 뷰가 있으면 터치 이벤트 인터셉트
+   - `pointerEvents="box-none"` 사용 시 터치 이벤트 직접 전달 보장
+
+3. **Scroll Position 복원** (Android: `AdchainOfferwallView.kt:315-354`, iOS: `AdchainOfferwallView.swift:300-349`)
+   - JavaScript로 DOM 탐색하여 scrollable container 찾음
+   - 외부 ScrollView가 있으면 DOM 구조가 달라져 탐색 실패
+   - 스크롤 위치 저장/복원 기능 오작동
+
+4. **Back Button 제어** (Android 전용, `AdchainOfferwallView.kt:800-811`)
+   - WebView 내부 네비게이션 스택을 우선 처리
+   - React Navigation Stack이 있으면 이벤트 전달 순서 충돌
+   - `UIManager.dispatchViewManagerCommand`로 네이티브에 직접 위임 필요
+
+따라서 **탭 네비게이션의 루트 뷰에 직접 배치**해야 이 모든 기능이 정상 동작합니다.
+
+##### 문제 발생 시 증상
+
+잘못된 구조로 사용했을 때 나타나는 증상:
+
+- 🔴 **스크롤 충돌**: WebView 내부 스크롤이 작동하지 않음
+- 🔴 **터치 이벤트 무반응**: 버튼 클릭이 안 됨
+- 🔴 **백버튼 오작동**: Android 백버튼이 앱을 종료시킴 (WebView 뒤로가기 무시)
+- 🔴 **화면 전환 깨짐**: 페이지 이동 시 이전 화면이 그대로 남아있음
+- 🔴 **스크롤 위치 복원 실패**: 뒤로가기 후 스크롤 위치가 맨 위로 초기화됨
+
+이러한 문제가 발생하면 `AdchainOfferwallView`의 부모 구조를 확인하고 위의 **올바른 구조**로 수정하세요.
+
 **Props**:
 | Prop | Type | Required | 설명 |
 |------|------|----------|------|
@@ -380,6 +489,12 @@ cd ..
 ```
 
 ## 🔍 트러블슈팅
+
+### AdchainOfferwallView 관련 문제
+
+**증상**: 스크롤 충돌, 터치 이벤트 무반응, 백버튼 오작동, 화면 전환 깨짐 등
+
+**해결**: [Step 3-B의 "올바른 배치 구조"](#️-중요-올바른-배치-구조) 섹션을 참고하여 `AdchainOfferwallView`를 탭의 루트 뷰에 직접 배치하세요. ScrollView, FlatList, React Navigation Stack으로 래핑하면 안 됩니다.
 
 ### SDK 초기화 실패
 
