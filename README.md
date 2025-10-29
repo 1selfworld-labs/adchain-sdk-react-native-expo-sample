@@ -16,7 +16,7 @@ AdChain SDK의 React Native 통합 예제 앱입니다. Expo 환경에서 광고
 - **WebView ↔ Native 이벤트 브릿지**:
   - `onCustomEvent`: WebView에서 Native로 이벤트 전송 (예: toast, navigation, share)
   - `onDataRequest`: WebView에서 Native 데이터 요청 (예: user_points, user_profile)
-- **Android 백버튼 처리** (SDK v1.0.15+):
+- **Android 백버튼 처리** (SDK v1.0.17+):
   - `onBackPressOnFirstPage`: WebView 첫 페이지에서 백버튼 → 앱 종료 허용
   - `onBackNavigated`: WebView 내부 뒤로가기 성공
 
@@ -316,8 +316,8 @@ Android/iOS 네이티브 SDK는 다음과 같은 특수 기능을 구현합니�
 | `onOfferwallClosed` | `() => void` | ❌ | 오퍼월 닫힘 콜백 |
 | `onOfferwallError` | `(error: string) => void` | ❌ | 에러 콜백 |
 | `onRewardEarned` | `(amount: number) => void` | ❌ | 리워드 적립 콜백 |
-| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) WebView 첫 페이지에서 백버튼 콜백 (v1.0.15+) |
-| `onBackNavigated` | `() => void` | ❌ | (Android) WebView 뒤로가기 성공 콜백 (v1.0.15+) |
+| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) WebView 첫 페이지에서 백버튼 콜백 (v1.0.17+) |
+| `onBackNavigated` | `() => void` | ❌ | (Android) WebView 뒤로가기 성공 콜백 (v1.0.17+) |
 
 **샘플 앱 구현**: `src/components/TabNavigation.tsx`
 
@@ -394,7 +394,7 @@ WebView가 Native 앱에 데이터를 요청할 수 있습니다:
 - 데이터가 있으면 객체 반환 → WebView로 전송됨
 - 데이터가 없으면 `null` 또는 `undefined` 반환
 
-### 3. Android 백버튼 처리 (SDK v1.0.15+)
+### 3. Android 백버튼 처리 (SDK v1.0.17+)
 
 임베디드 오퍼월에서 Android 백버튼을 WebView 내부 네비게이션에 위임하고, 앱 종료를 처리합니다:
 
@@ -631,8 +631,8 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 | `onRewardEarned` | `(amount: number) => void` | ❌ | 리워드 적립 콜백 |
 | `onCustomEvent` | `(eventType: string, payload: any) => void` | ❌ | WebView 커스텀 이벤트 콜백 |
 | `onDataRequest` | `(requestType: string, params: any) => any` | ❌ | WebView 데이터 요청 콜백 |
-| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) 첫 페이지 백버튼 콜백 (v1.0.15+) |
-| `onBackNavigated` | `() => void` | ❌ | (Android) 뒤로가기 성공 콜백 (v1.0.15+) |
+| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) 첫 페이지 백버튼 콜백 (v1.0.17+) |
+| `onBackNavigated` | `() => void` | ❌ | (Android) 뒤로가기 성공 콜백 (v1.0.17+) |
 
 ## 🎯 placementId 가이드
 
@@ -651,7 +651,8 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 
 ## 📦 Dependencies
 
-- **AdChain SDK**: `@1selfworld/adchain-sdk-react-native` ^1.0.15
+- **AdChain SDK**: `@1selfworld/adchain-sdk-react-native` ^1.0.17
+- **iOS Native SDK**: AdChainSDK v1.0.45
 - **AsyncStorage**: `@react-native-async-storage/async-storage` ^2.2.0
 - **Expo**: ~53.0.0
 - **React Native**: 0.79.6
@@ -659,6 +660,11 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 - **TypeScript**: ~5.8.3
 
 ## 📝 Changelog
+
+### v1.0.17 (2025-01-30)
+- 🔧 **SDK 업그레이드**: React Native SDK 1.0.15 → 1.0.17
+- 🔧 **iOS Native SDK 업그레이드**: v1.0.42 → v1.0.45
+- 📦 Pod 의존성 업데이트
 
 ### v1.0.15 (2025-01-29)
 - ✨ **백버튼 앱 종료 처리**: `onBackPressOnFirstPage` / `onBackNavigated` 이벤트 추가
