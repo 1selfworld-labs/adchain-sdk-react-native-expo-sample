@@ -10,6 +10,7 @@ import {
   View,
   findNodeHandle,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { AdchainOfferwallView } from '@1selfworld/adchain-sdk-react-native';
 import HomeScreen from '../screens/HomeScreen';
 
@@ -54,7 +55,7 @@ const TabNavigation = () => {
     <View style={styles.container}>
       {/* Benefits 탭일 때는 ScrollView 없이 전체 화면 사용 */}
       {activeTab === 'benefits' ? (
-        <View style={styles.contentContainer} pointerEvents="box-none">
+        <SafeAreaView style={styles.contentContainer} edges={['top']}>
           <AdchainOfferwallView
             ref={offerwallViewRef}
             placementId="tab_embedded_offerwall"
@@ -93,6 +94,18 @@ const TabNavigation = () => {
                   `Title: ${payload.title || ''}\nURL: ${payload.url || ''}\n\n✅ Sample 앱에서 처리됨`,
                   [{ text: '확인', style: 'default' }]
                 );
+              } else if (eventType === 'buy_ticket') {
+                Alert.alert(
+                  '🎫 티켓 구매',
+                  `티켓 ID: ${payload.ticketId || 'N/A'}\n금액: ${payload.amount || 'N/A'}\n\n${JSON.stringify(payload, null, 2)}\n\n✅ Sample 앱에서 처리됨`,
+                  [{ text: '확인', style: 'default' }]
+                );
+              } else if (eventType === 'show_ticket_list') {
+                Alert.alert(
+                  '📋 티켓 리스트 표시',
+                  `사용자 ID: ${payload.userId || 'N/A'}\n\n${JSON.stringify(payload, null, 2)}\n\n✅ Sample 앱에서 처리됨`,
+                  [{ text: '확인', style: 'default' }]
+                );
               } else {
                 Alert.alert(
                   `📨 Custom Event: ${eventType}`,
@@ -117,7 +130,7 @@ const TabNavigation = () => {
               return response;
             }}
           />
-        </View>
+        </SafeAreaView>
       ) : (
         <ScrollView style={styles.contentContainer}>
           <HomeScreen />
