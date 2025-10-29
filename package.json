@@ -9,7 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
-    "@1selfworld/adchain-sdk-react-native": "^1.0.12",
+    "@1selfworld/adchain-sdk-react-native": "^1.0.15",
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@types/react": "~19.0.10",
     "expo": "~53.0.0",

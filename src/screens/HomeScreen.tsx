@@ -208,6 +208,15 @@ export default function HomeScreen() {
     }
   };
 
+  const handleOpenNestAds = async () => {
+    try {
+      await AdchainSDK.openOfferwallNestAds('test-nestads-placement');
+      showToast('NestAds Offerwall opened!', 'success');
+    } catch (error: any) {
+      showToast(error.message, 'error');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Toast
@@ -306,6 +315,13 @@ export default function HomeScreen() {
         onPress={handleOpenOfferwall}
         disabled={!loggedIn}>
         <Text style={styles.offerwallButtonText}>오퍼월 열기</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.nestadsButton, !loggedIn && styles.buttonDisabled]}
+        onPress={handleOpenNestAds}
+        disabled={!loggedIn}>
+        <Text style={styles.nestadsButtonText}>NestAds 오퍼월 열기</Text>
       </TouchableOpacity>
     </View>
   );
@@ -430,6 +446,18 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   offerwallButtonText: {
+    color: "#FFF",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  nestadsButton: {
+    backgroundColor: "#4CAF50",
+    borderRadius: 8,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginTop: 10,
+  },
+  nestadsButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "600",

@@ -9,13 +9,16 @@ AdChain SDK의 React Native 통합 예제 앱입니다. Expo 환경에서 광고
 - **사용자 로그인/로그아웃**: User ID, Gender, Birth Year 입력 폼 제공
 - **로그인 데이터 저장**: AsyncStorage로 로그인 정보 자동 복원
 - **모달 오퍼월**: `AdchainSDK.openOfferwall()` - 전체 화면 오퍼월 팝업
+- **NestAds 오퍼월**: `AdchainSDK.openOfferwallNestAds()` - NestAds 파트너 오퍼월
 
 ### 혜택 탭
 - **임베디드 오퍼월**: `AdchainOfferwallView` 컴포넌트 - 탭 내부에 직접 임베드
 - **WebView ↔ Native 이벤트 브릿지**:
   - `onCustomEvent`: WebView에서 Native로 이벤트 전송 (예: toast, navigation, share)
   - `onDataRequest`: WebView에서 Native 데이터 요청 (예: user_points, user_profile)
-- **Android 백버튼 처리**: WebView 내부 네비게이션 스택 자동 처리
+- **Android 백버튼 처리** (SDK v1.0.15+):
+  - `onBackPressOnFirstPage`: WebView 첫 페이지에서 백버튼 → 앱 종료 허용
+  - `onBackNavigated`: WebView 내부 뒤로가기 성공
 
 ## 🚀 빠른 시작
 
@@ -313,6 +316,8 @@ Android/iOS 네이티브 SDK는 다음과 같은 특수 기능을 구현합니�
 | `onOfferwallClosed` | `() => void` | ❌ | 오퍼월 닫힘 콜백 |
 | `onOfferwallError` | `(error: string) => void` | ❌ | 에러 콜백 |
 | `onRewardEarned` | `(amount: number) => void` | ❌ | 리워드 적립 콜백 |
+| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) WebView 첫 페이지에서 백버튼 콜백 (v1.0.15+) |
+| `onBackNavigated` | `() => void` | ❌ | (Android) WebView 뒤로가기 성공 콜백 (v1.0.15+) |
 
 **샘플 앱 구현**: `src/components/TabNavigation.tsx`
 
@@ -389,12 +394,13 @@ WebView가 Native 앱에 데이터를 요청할 수 있습니다:
 - 데이터가 있으면 객체 반환 → WebView로 전송됨
 - 데이터가 없으면 `null` 또는 `undefined` 반환
 
-### 3. Android 백버튼 처리
+### 3. Android 백버튼 처리 (SDK v1.0.15+)
 
-임베디드 오퍼월에서 Android 백버튼을 WebView 내부 네비게이션에 위임:
+임베디드 오퍼월에서 Android 백버튼을 WebView 내부 네비게이션에 위임하고, 앱 종료를 처리합니다:
 
 ```tsx
 const offerwallViewRef = useRef(null);
+const [shouldAllowExit, setShouldAllowExit] = useState(false);
 
 // BackHandler 리스너 등록
 useEffect(() => {
@@ -409,23 +415,49 @@ useEffect(() => {
           'handleBackPress',
           []
         );
-        return true; // 기본 동작 막기
+        return true; // 기본 동작 막고 네이티브 이벤트 대기
       }
     }
-    return false; // 기본 동작 허용
+    return false; // 다른 탭에서는 기본 동작 허용
   });
 
   return () => backHandler.remove();
 }, [activeTab]);
 
-// Ref 전달
+// 앱 종료 처리
+useEffect(() => {
+  if (shouldAllowExit) {
+    const timer = setTimeout(() => {
+      BackHandler.exitApp();
+    }, 100);
+    return () => clearTimeout(timer);
+  }
+}, [shouldAllowExit]);
+
+// 백버튼 이벤트 핸들러
 <AdchainOfferwallView
   ref={offerwallViewRef}
   placementId="benefits_tab"
+  onBackPressOnFirstPage={() => {
+    // WebView가 첫 페이지 → 앱 종료 허용
+    setShouldAllowExit(true);
+  }}
+  onBackNavigated={() => {
+    // WebView 내부 뒤로가기 성공 → 종료 취소
+    setShouldAllowExit(false);
+  }}
 />
 ```
 
-**샘플 앱 구현**: `src/components/TabNavigation.tsx`
+**이벤트 설명**:
+- `onBackPressOnFirstPage`: WebView 스택에 페이지가 1개만 있을 때 (더 이상 뒤로갈 수 없음)
+  - 앱 종료, 다른 탭 이동 등의 로직을 구현
+- `onBackNavigated`: WebView 스택에서 성공적으로 뒤로 이동했을 때
+  - WebView 내부 네비게이션이 처리됨
+
+**샘플 앱 구현**: `src/components/TabNavigation.tsx:18-51, 66-73`
+
+**참고**: 자세한 기술 문서는 `DEVELOPER_GUIDE.md`의 "Android 백버튼 처리" 섹션을 참고하세요.
 
 ## 📂 프로젝트 구조
 
@@ -583,6 +615,7 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 | `login(params)` | `{ userId: string, gender?: "MALE" \| "FEMALE", birthYear?: number }` | `Promise<void>` | 사용자 로그인 |
 | `logout()` | - | `Promise<void>` | 사용자 로그아웃 |
 | `openOfferwall(placementId)` | `placementId: string` | `Promise<void>` | 모달 오퍼월 열기 |
+| `openOfferwallNestAds(placementId)` | `placementId: string` | `Promise<void>` | NestAds 오퍼월 열기 |
 | `isInitialized()` | - | `Promise<boolean>` | SDK 초기화 상태 확인 |
 | `isLoggedIn()` | - | `Promise<boolean>` | 로그인 상태 확인 |
 
@@ -598,6 +631,8 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 | `onRewardEarned` | `(amount: number) => void` | ❌ | 리워드 적립 콜백 |
 | `onCustomEvent` | `(eventType: string, payload: any) => void` | ❌ | WebView 커스텀 이벤트 콜백 |
 | `onDataRequest` | `(requestType: string, params: any) => any` | ❌ | WebView 데이터 요청 콜백 |
+| `onBackPressOnFirstPage` | `() => void` | ❌ | (Android) 첫 페이지 백버튼 콜백 (v1.0.15+) |
+| `onBackNavigated` | `() => void` | ❌ | (Android) 뒤로가기 성공 콜백 (v1.0.15+) |
 
 ## 🎯 placementId 가이드
 
@@ -616,12 +651,20 @@ import AdchainOfferwallView from './components/AdchainOfferwallView';
 
 ## 📦 Dependencies
 
-- **AdChain SDK**: `@1selfworld/adchain-sdk-react-native` ^1.0.11
+- **AdChain SDK**: `@1selfworld/adchain-sdk-react-native` ^1.0.15
 - **AsyncStorage**: `@react-native-async-storage/async-storage` ^2.2.0
 - **Expo**: ~53.0.0
 - **React Native**: 0.79.6
 - **React**: 19.0.0
 - **TypeScript**: ~5.8.3
+
+## 📝 Changelog
+
+### v1.0.15 (2025-01-29)
+- ✨ **백버튼 앱 종료 처리**: `onBackPressOnFirstPage` / `onBackNavigated` 이벤트 추가
+- ✨ **NestAds 오퍼월 지원**: HomeScreen에 NestAds 버튼 추가
+- 📚 **DEVELOPER_GUIDE.md 추가**: 백버튼 처리 상세 가이드
+- 🔧 SDK 의존성: ^1.0.12 → ^1.0.15
 
 ## 💡 추가 리소스
 

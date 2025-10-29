@@ -1,5 +1,5 @@
 PODS:
-  - adchain-sdk-react-native (1.0.11):
+  - adchain-sdk-react-native (1.0.15):
     - AdChainSDK
     - React-Core
   - AdChainSDK (1.0.42)
@@ -2068,7 +2068,7 @@ CHECKOUT OPTIONS:
     :tag: v1.0.42
 
 SPEC CHECKSUMS:
-  adchain-sdk-react-native: 778e81df39f01be7222ac2f6fead13ea477a280d
+  adchain-sdk-react-native: 111ba48108180841b9470c2850a9272b5b7b8494
   AdChainSDK: b48d3f171a08e5d4f2cac39bbd646121f2795b7f
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb

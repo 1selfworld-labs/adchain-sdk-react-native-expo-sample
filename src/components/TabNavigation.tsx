@@ -16,6 +16,7 @@ import HomeScreen from '../screens/HomeScreen';
 const TabNavigation = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'benefits'>('home');
   const offerwallViewRef = useRef(null);
+  const [shouldAllowExit, setShouldAllowExit] = useState(false);
 
   // Handle back button for Benefits tab
   useEffect(() => {
@@ -29,7 +30,7 @@ const TabNavigation = () => {
             'handleBackPress',
             []
           );
-          return true; // Prevent default back behavior
+          return true; // Prevent default back behavior, wait for native event
         }
       }
       return false; // Allow default back behavior for other tabs
@@ -37,6 +38,17 @@ const TabNavigation = () => {
 
     return () => backHandler.remove();
   }, [activeTab]);
+
+  // Handle app exit when shouldAllowExit is true
+  useEffect(() => {
+    if (shouldAllowExit) {
+      console.log('[TabNavigation] Exiting app after 100ms delay');
+      const timer = setTimeout(() => {
+        BackHandler.exitApp();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAllowExit]);
 
   return (
     <View style={styles.container}>
@@ -51,6 +63,14 @@ const TabNavigation = () => {
             onOfferwallClosed={() => console.log('Offerwall closed in benefits tab')}
             onOfferwallError={(error) => console.error('Offerwall error:', error)}
             onRewardEarned={(amount) => console.log('Reward earned:', amount)}
+            onBackPressOnFirstPage={() => {
+              console.log('[TabNavigation] 🔴 onBackPressOnFirstPage - WebView is on first page, allowing app exit');
+              setShouldAllowExit(true);
+            }}
+            onBackNavigated={() => {
+              console.log('[TabNavigation] 🔵 onBackNavigated - WebView navigated back successfully');
+              setShouldAllowExit(false);
+            }}
             onCustomEvent={(eventType, payload) => {
               console.log('[WebView → App] Custom Event:', eventType, payload);
 
