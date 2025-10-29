@@ -171,13 +171,52 @@ onDataRequest={(requestType, params) => {
 - **iOS**: `ios/example/Info.plist`에 `AdChainAppKey`, `AdChainAppSecret`, `AdChainEnvironment` 추가
 - **Android**: `android/app/build.gradle`에 `buildConfigField` 추가
 
-### iOS 네이티브 의존성
-`ios/Podfile:20`에서 직접 Git Pod 사용:
-```ruby
-pod 'AdChainSDK', :git => 'https://github.com/1selfworld-labs/adchain-sdk-ios-release.git', :tag => 'v1.0.42'
+### iOS 네이티브 의존성 (🚨 중요)
+
+**❌ 절대 수동으로 Podfile을 수정하지 마세요!**
+
+iOS 네이티브 SDK는 **Expo Config Plugin이 자동으로 관리**합니다:
+
+```javascript
+// node_modules/@1selfworld/adchain-sdk-react-native/plugin/src/withAdchainIOS.js
+// Expo Config Plugin이 prebuild 시 자동으로 Podfile에 추가
+pod 'AdChainSDK', :git => 'https://github.com/1selfworld-labs/adchain-sdk-ios-release.git', :tag => 'v1.0.46'
 ```
 
-**이유**: CocoaPods Trunk에 퍼블리시되지 않음
+**작동 방식**:
+1. `@1selfworld/adchain-sdk-react-native` 패키지 설치
+2. `npx expo prebuild` 실행
+3. Expo Config Plugin (`withAdchainIOS`)이 자동으로 iOS SDK 버전을 Podfile에 주입
+4. 각 React Native SDK 버전마다 대응하는 iOS SDK 버전이 플러그인에 하드코딩되어 있음
+
+**버전 매핑** (README 참조):
+- React Native SDK v1.0.18 → iOS SDK v1.0.46 (자동)
+- React Native SDK v1.0.17 → iOS SDK v1.0.45 (자동)
+- React Native SDK v1.0.15 → iOS SDK v1.0.45 (자동)
+
+**올바른 작업 흐름**:
+```bash
+# 1. React Native SDK 버전 변경
+npm install @1selfworld/adchain-sdk-react-native@1.0.18
+
+# 2. Expo prebuild로 네이티브 프로젝트 재생성 (플러그인 자동 실행)
+npx expo prebuild --platform ios --clean
+
+# 3. 확인: Podfile에 iOS SDK v1.0.46이 자동 추가되었는지 확인
+cat ios/Podfile | grep AdChainSDK
+```
+
+**잘못된 작업 흐름** (절대 금지):
+```bash
+# ❌ Podfile을 직접 수정하지 마세요!
+# ❌ pod 'AdChainSDK', :tag => 'v1.0.XX'를 수동으로 추가/변경하지 마세요!
+# ❌ 플러그인과 수동 설정이 충돌합니다!
+```
+
+**이유**:
+- CocoaPods Trunk에 AdChainSDK가 퍼블리시되지 않아 Git Pod 방식 사용
+- 버전 관리를 Expo Config Plugin에 위임하여 React Native SDK ↔ iOS SDK 호환성 보장
+- 수동 수정 시 SDK 버전 불일치로 빌드 실패 가능
 
 ### Android 네이티브 의존성
 `android/build.gradle:28-29`에서 Maven 저장소 추가:
@@ -234,17 +273,38 @@ Xcode에서:
 
 ## 패키지 의존성 업데이트
 
-### SDK 업데이트
+### SDK 업데이트 (🚨 올바른 절차)
+
+**1. React Native SDK 업데이트**:
 ```bash
-npm update @1selfworld/adchain-sdk-react-native
+npm install @1selfworld/adchain-sdk-react-native@latest
+# 또는 특정 버전
+npm install @1selfworld/adchain-sdk-react-native@1.0.18
 ```
 
-**iOS Pod 업데이트도 필요**:
+**2. Expo Prebuild 재실행** (iOS SDK 자동 업데이트):
 ```bash
-cd ios
-pod update AdChainSDK
-cd ..
+npx expo prebuild --platform ios --clean
 ```
+
+**3. 확인**:
+```bash
+# React Native SDK 버전 확인
+npm list @1selfworld/adchain-sdk-react-native
+
+# iOS SDK 버전 확인 (Podfile.lock)
+cat ios/Podfile.lock | grep "AdChainSDK ("
+```
+
+**❌ 잘못된 방법**:
+```bash
+# ❌ pod update AdChainSDK를 직접 실행하지 마세요!
+# ❌ Expo Config Plugin이 관리하므로 수동 업데이트 불필요
+cd ios
+pod update AdChainSDK  # 절대 금지!
+```
+
+**이유**: React Native SDK 버전과 iOS SDK 버전이 불일치하면 빌드 실패합니다.
 
 ### Expo SDK 업데이트
 ```bash
@@ -279,3 +339,109 @@ cd ..
 2. `npx expo prebuild --clean` 재실행 (네이티브 코드 재생성)
 3. iOS: Info.plist에 `AdChainAppKey` 존재 확인
 4. Android: `build.gradle`에 `ADCHAIN_APP_KEY` 존재 확인
+
+---
+
+## 🎓 Lessons Learned (AI 작업 시 주의사항)
+
+### 1. iOS SDK 의존성은 절대 수동으로 건드리지 마세요!
+
+**핵심 원칙**:
+> **Expo Config Plugin이 자동으로 iOS SDK 버전을 Podfile에 추가합니다.**
+
+**흔한 실수**:
+```bash
+# ❌ 잘못된 접근
+cd ios
+vim Podfile  # AdChainSDK 버전을 직접 수정
+pod install
+```
+
+**올바른 접근**:
+```bash
+# ✅ 올바른 접근
+npm install @1selfworld/adchain-sdk-react-native@1.0.18
+npx expo prebuild --platform ios --clean  # 플러그인이 자동으로 v1.0.46 추가
+```
+
+**왜 이렇게 해야 하나요?**
+1. React Native SDK와 iOS 네이티브 SDK 버전이 강하게 결합되어 있습니다
+2. 각 React Native SDK 버전은 특정 iOS SDK 버전을 요구합니다 (예: v1.0.18 → v1.0.46)
+3. Expo Config Plugin (`withAdchainIOS`)이 이 매핑을 관리합니다
+4. 수동으로 Podfile을 수정하면 버전 불일치로 빌드 실패가 발생합니다
+
+**자동화 흐름**:
+```
+npm install v1.0.18
+    ↓
+npx expo prebuild
+    ↓
+withAdchainIOS 플러그인 실행
+    ↓
+Podfile에 v1.0.46 자동 주입
+    ↓
+pod install 자동 실행
+    ↓
+✅ 정확한 버전 설치 완료
+```
+
+### 2. Podspec 파일의 한계 이해하기
+
+`adchain-sdk-react-native.podspec`에는 버전이 명시되지 않습니다:
+```ruby
+s.dependency "AdChainSDK"  # 버전 없음!
+```
+
+**이유**: CocoaPods Trunk에 AdChainSDK가 퍼블리시되지 않아 Git Pod 방식을 사용해야 하는데, podspec에서는 Git Pod를 지정할 수 없습니다. 따라서 Expo Config Plugin이 Podfile을 직접 수정하는 방식으로 구현되었습니다.
+
+### 3. 버전 업데이트 체크리스트
+
+React Native SDK를 업데이트할 때:
+
+```bash
+# 1. React Native SDK 버전 변경
+npm install @1selfworld/adchain-sdk-react-native@1.0.18
+
+# 2. node_modules 캐시 문제 방지 (선택적)
+rm -rf node_modules package-lock.json
+npm cache clean --force
+npm install
+
+# 3. Expo prebuild로 네이티브 재생성
+npx expo prebuild --platform ios --clean
+
+# 4. 버전 확인
+cat ios/Podfile | grep AdChainSDK
+# 출력: pod 'AdChainSDK', :git => '...', :tag => 'v1.0.46'
+
+cat ios/Podfile.lock | grep "AdChainSDK ("
+# 출력: AdChainSDK (1.0.46)
+
+# 5. 빌드
+npx expo run:ios --no-bundler
+npx expo run:android --no-bundler
+```
+
+### 4. 디버깅 팁
+
+**iOS SDK 버전 불일치 의심 시**:
+```bash
+# 현재 설치된 iOS SDK 버전 확인
+cat ios/Podfile.lock | grep -A5 "AdChainSDK"
+
+# React Native SDK가 요구하는 버전 확인
+cat node_modules/@1selfworld/adchain-sdk-react-native/README.md | grep -A10 "버전 호환성"
+
+# 플러그인이 추가하는 버전 확인
+cat node_modules/@1selfworld/adchain-sdk-react-native/plugin/src/withAdchainIOS.js | grep "tag.*v"
+```
+
+**빌드 실패 시 첫 번째 체크포인트**:
+1. Podfile에 AdChainSDK가 2번 선언되어 있지 않은가? (수동 + 플러그인 중복)
+2. iOS SDK 버전이 README의 "버전 호환성" 표와 일치하는가?
+3. `npx expo prebuild --clean`을 최근에 실행했는가?
+
+---
+
+**기억하세요**:
+> "Podfile을 직접 수정하고 싶은 충동이 들면, 먼저 Expo Config Plugin을 확인하세요!"

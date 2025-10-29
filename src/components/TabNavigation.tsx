@@ -58,7 +58,7 @@ const TabNavigation = () => {
         <SafeAreaView style={styles.contentContainer} edges={['top']}>
           <AdchainOfferwallView
             ref={offerwallViewRef}
-            placementId="tab_embedded_offerwall"
+            placementId="sample-test-expo-placement"
             style={{ flex: 1, width: '100%' }}
             onOfferwallOpened={() => console.log('Offerwall opened in benefits tab')}
             onOfferwallClosed={() => console.log('Offerwall closed in benefits tab')}

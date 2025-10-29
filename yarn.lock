@@ -7,10 +7,10 @@
   resolved "https://registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.2.0.tgz"
   integrity sha512-/1iHy9TTr63gE1YcR5idjx8UREz1s0kFhydf3bBLCXyqjhkIc6igAzTOx3zPifCwFR87tsh/4Pa9cNts6d2otw==
 
-"@1selfworld/adchain-sdk-react-native@^1.0.17":
-  version "1.0.17"
-  resolved "https://registry.npmjs.org/@1selfworld/adchain-sdk-react-native/-/adchain-sdk-react-native-1.0.17.tgz"
-  integrity sha512-USP0tmRtvvVrQ8GU2Igs3KNnGE6O6dfRuF/uSYbNPCcr0YvTfTKLuFnC2Yk3c5+HKSaPX8KzbFBDUJ9gIrLu6Q==
+"@1selfworld/adchain-sdk-react-native@^1.0.19":
+  version "1.0.19"
+  resolved "https://registry.npmjs.org/@1selfworld/adchain-sdk-react-native/-/adchain-sdk-react-native-1.0.19.tgz"
+  integrity sha512-iiUkgFYMRvRXQXbdIzdwgjFJz97pXHPq4v8uDxIyjU/6GY4DFHyJEZOpyNbCqcV9EfEJkZoemNTKsLf3fCZ4qg==
 
 "@ark/regex@0.0.0":
   version "0.0.0"

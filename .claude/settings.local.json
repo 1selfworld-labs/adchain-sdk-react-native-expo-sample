@@ -23,7 +23,10 @@
       "Bash(git describe:*)",
       "Bash(nm:*)",
       "WebFetch(domain:github.com)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(npm info:*)",
+      "Bash(xargs curl -sL)",
+      "Bash(tar:*)"
     ],
     "deny": [],
     "ask": []
