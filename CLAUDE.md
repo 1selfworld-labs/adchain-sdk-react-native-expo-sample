@@ -190,6 +190,9 @@ pod 'AdChainSDK', :git => 'https://github.com/1selfworld-labs/adchain-sdk-ios-re
 4. 각 React Native SDK 버전마다 대응하는 iOS SDK 버전이 플러그인에 하드코딩되어 있음
 
 **버전 매핑** (README 참조):
+- React Native SDK v1.0.21 → iOS SDK v1.0.47 (자동)
+- React Native SDK v1.0.20 → iOS SDK v1.0.47 (자동)
+- React Native SDK v1.0.19 → iOS SDK v1.0.46 (자동)
 - React Native SDK v1.0.18 → iOS SDK v1.0.46 (자동)
 - React Native SDK v1.0.17 → iOS SDK v1.0.45 (자동)
 - React Native SDK v1.0.15 → iOS SDK v1.0.45 (자동)
