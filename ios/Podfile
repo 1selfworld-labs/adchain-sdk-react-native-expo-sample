@@ -14,10 +14,10 @@ install! 'cocoapods',
 prepare_react_native_project!
 
 target 'example' do
-  # AdChain SDK (Git Pod) - v1.0.42
+  # AdChain SDK (Git Pod) - v1.0.45
   # CocoaPods Trunk에 없으므로 Git 방식 사용
   # Swift 5.5 (5.9 optional 파라미터 버그 회피)
-  pod 'AdChainSDK', :git => 'https://github.com/1selfworld-labs/adchain-sdk-ios-release.git', :tag => 'v1.0.42'
+  pod 'AdChainSDK', :git => 'https://github.com/1selfworld-labs/adchain-sdk-ios-release.git', :tag => 'v1.0.45'
 
   use_expo_modules!
 

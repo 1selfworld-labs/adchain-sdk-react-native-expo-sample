@@ -15,7 +15,15 @@
       "Bash(adb devices:*)",
       "Bash(adb shell:*)",
       "Bash(npx react-native config)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(npm run android:*)",
+      "Bash(echo:*)",
+      "Read(//Users/donghoon/**)",
+      "Bash(git pull:*)",
+      "Bash(git describe:*)",
+      "Bash(nm:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(git tag:*)"
     ],
     "deny": [],
     "ask": []
