@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, Platform, SafeAreaView, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import AdchainSDK from '@1selfworld/adchain-sdk-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from '../components/Toast';
@@ -218,15 +218,16 @@ export default function HomeScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Toast
-        visible={toast.visible}
-        message={toast.message}
-        type={toast.type}
-        onHide={hideToast}
-      />
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Toast
+          visible={toast.visible}
+          message={toast.message}
+          type={toast.type}
+          onHide={hideToast}
+        />
 
-      <Text style={styles.title}>AdChain Expo SDK Test</Text>
+        <Text style={styles.title}>AdChain Expo SDK Test</Text>
 
       <Text style={styles.status}>
         SDK: {isInitializing ? '⏳ Initializing...' : sdkInitialized ? '✅ Initialized' : '❌ Not Initialized'}
@@ -317,23 +318,26 @@ export default function HomeScreen() {
         <Text style={styles.offerwallButtonText}>오퍼월 열기</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.nestadsButton, !loggedIn && styles.buttonDisabled]}
-        onPress={handleOpenNestAds}
-        disabled={!loggedIn}>
-        <Text style={styles.nestadsButtonText}>NestAds 오퍼월 열기</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={[styles.nestadsButton, !loggedIn && styles.buttonDisabled]}
+          onPress={handleOpenNestAds}
+          disabled={!loggedIn}>
+          <Text style={styles.nestadsButtonText}>NestAds 오퍼월 열기</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
   container: {
     flex: 1,
-    width: "100%",
     paddingVertical: 20,
     paddingHorizontal: 20,
-    backgroundColor: "#FFFFFF",
   },
   title: {
     fontSize: 24,
